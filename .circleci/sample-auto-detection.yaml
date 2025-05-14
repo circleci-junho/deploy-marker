@@ -1,0 +1,25 @@
+version: 2.1
+
+jobs:
+  # This job will automatically create a deploy marker because its name contains 'deploy'
+  deploy-auto-marker:
+    docker:
+      - image: cimg/base:2023.03
+    steps:
+      - checkout
+      - run:
+          name: "Preparation stage"
+          command: echo "Starting deployment preparation."
+      - run:
+          name: "Deployment simulation"
+          command: |
+            echo "Simulating deployment process..."
+            sleep 5  # Simulating deployment time
+      - run:
+          name: "Deployment complete"
+          command: echo "Deployment completed successfully."
+
+workflows:
+  auto-deploy-marker:
+    jobs:
+      - deploy-auto-marker
