@@ -7,32 +7,11 @@ jobs:
     steps:
       - checkout
       
-      # Record deployment start
+      # Record deployment plan
       - run:
-          name: "Create deployment start marker"
+          name: "Create deployment plan"
           command: |
-            circleci run release log \
-              --environment-name=poc-environment \
-              --component-name=poc-component \
-              --target-version=v1.0.0 \
-              --description="Deployment started"
-      
-      # Preparation stage
-      - run:
-          name: "Deployment preparation stage"
-          command: |
-            echo "Performing preparation tasks for deployment..."
-            sleep 3
-      
-      # Record preparation completion
-      - run:
-          name: "Create preparation complete marker"
-          command: |
-            circleci run release log \
-              --environment-name=poc-environment \
-              --component-name=poc-component \
-              --target-version=v1.0.0 \
-              --description="Preparation stage complete"
+            circleci run release plan --target-version=v1.0.0
       
       # Deployment stage
       - run:
@@ -40,36 +19,51 @@ jobs:
           command: |
             echo "Executing actual deployment..."
             sleep 5
-      
-      # Record deployment completion
+
+      # Record deployment start
       - run:
-          name: "Create deployment complete marker"
+          name: "Update deployment to running"
           command: |
-            circleci run release log \
-              --environment-name=poc-environment \
-              --component-name=poc-component \
-              --target-version=v1.0.0 \
-              --description="Deployment complete"
-      
+            circleci run release update --status=running
+
       # Validation stage
       - run:
           name: "Validate deployment"
           command: |
             echo "Validating deployment result..."
             sleep 3
-      
-      # Final completion and validation marker
+
+      # Record deployment completion
       - run:
-          name: "Create final completion marker"
+          name: "Update deployment to complete"
           command: |
-            circleci run release log \
-              --environment-name=poc-environment \
-              --component-name=poc-component \
-              --target-version=v1.0.0 \
-              --description="Deployment validation complete" \
-              --deploymentType="ROLLING"
+            circleci run release update \
+              --status=SUCCESS
+          when: on_success
+      
+      # Record deployment completion
+      - run:
+          name: "Update deployment to failed"
+          command: |
+            circleci run release update \
+              --status=FAILED
+          when: on_fail
+
+  cancel-deployment:
+    docker:
+      - image: cimg/base:2023.03
+    steps:
+      - run:
+          name: Update planned release to CANCELED
+          command: |
+            circleci run release update \
+              --status=CANCELED
 
 workflows:
   manual-deploy-marker:
     jobs:
       - manual-marker-deployment
+      - cancel-deployment:
+          requires:
+            - manual-marker-deployment:
+              - canceled
