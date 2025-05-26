@@ -14,7 +14,7 @@ jobs:
           name: "Deployment simulation"
           command: |
             echo "Simulating deployment process..."
-            sleep 5  # Simulating deployment time
+            sleep 3  # Simulating deployment time
       - run:
           name: "Deployment complete"
           command: echo "Deployment completed successfully."
