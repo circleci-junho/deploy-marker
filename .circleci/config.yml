@@ -13,8 +13,7 @@ jobs:
           command: |
             circleci run release plan \
               --environment-name=poc-environment \
-              --component-name=poc-component \
-              --target-version=${CIRCLE_SHA1::10}
+              --component-name=poc-component
 
       # Deployment stage
       - run:
