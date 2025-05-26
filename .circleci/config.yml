@@ -27,10 +27,7 @@ jobs:
       - run:
           name: "Update deployment to running"
           command: |
-            circleci run release update \
-              --environment-name=poc-environment \
-              --component-name=poc-component \
-              --status=running
+            circleci run release update --status=running
 
       # Validation stage
       - run:
@@ -43,20 +40,14 @@ jobs:
       - run:
           name: "Update deployment to complete"
           command: |
-            circleci run release update \
-              --environment-name=poc-environment \
-              --component-name=poc-component \
-              --status=SUCCESS
+            circleci run release update --status=SUCCESS
           when: on_success
       
       # Record deployment completion
       - run:
           name: "Update deployment to failed"
           command: |
-            circleci run release update \
-              --environment-name=poc-environment \
-              --component-name=poc-component \
-              --status=FAILED
+            circleci run release update --status=FAILED
           when: on_fail
 
   cancel-deployment:
@@ -66,10 +57,7 @@ jobs:
       - run:
           name: Update planned release to CANCELED
           command: |
-            circleci run release update \
-              --environment-name=poc-environment \
-              --component-name=poc-component \
-              --status=CANCELED
+            circleci run release update --status=CANCELED
 
 workflows:
   manual-deploy-marker:
